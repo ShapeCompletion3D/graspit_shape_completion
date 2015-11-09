@@ -1,0 +1,7 @@
+#goal
+shape_msgs/Mesh partial_mesh
+---
+#result
+shape_msgs/Mesh completed_mesh
+---
+#feedback
