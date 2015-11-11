@@ -43,6 +43,7 @@
 #include <src/DBase/DBPlanner/ros_database_manager.h>
 #include <src/DBase/graspit_db_model.h>
 #include <src/Collision/collisionStructures.h>
+
 #include <include/mytools.h>
 #include <include/world.h>
 #include <include/body.h>
@@ -55,6 +56,7 @@
 #include <sensor_msgs/point_cloud_conversion.h>
 #include <include/EGPlanner/egPlanner.h>
 #include <include/EGPlanner/simAnnPlanner.h>
+
 #include <include/grasp.h>
 #include <include/triangle.h>
 #include <geometry_msgs/Point.h>
