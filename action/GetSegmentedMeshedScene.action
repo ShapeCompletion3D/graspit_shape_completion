@@ -2,5 +2,6 @@
 ---
 #result
 shape_msgs/Mesh[] meshes
+geometry_msgs/Vector3[] offsets
 ---
 #feedback

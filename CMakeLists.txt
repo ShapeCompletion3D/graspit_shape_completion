@@ -11,6 +11,7 @@ find_package(catkin REQUIRED graspit shape_msgs actionlib)
 # find_package(Boost REQUIRED COMPONENTS system)
 find_package(Qt4 COMPONENTS QtCore QtGui  REQUIRED)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html

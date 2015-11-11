@@ -80,10 +80,13 @@ private:
   //! Node handle in the private namespace
   ros::NodeHandle *priv_nh_;
 
-  actionlib::SimpleActionClient<graspit_shape_completion::GetSegmentedMeshedSceneAction> get_segmented_meshed_scene_client;
-  actionlib::SimpleActionClient<graspit_shape_completion::CompleteMeshAction> complete_mesh_client;
+  actionlib::SimpleActionClient<graspit_shape_completion::GetSegmentedMeshedSceneAction> *get_segmented_meshed_scene_client;
+  actionlib::SimpleActionClient<graspit_shape_completion::CompleteMeshAction> *complete_mesh_client;
 
-  void addMesh(shape_msgs::Mesh mesh);
+  ros::Publisher meshed_scene_repub;
+  ros::Subscriber meshed_scene_sub;
+
+  void addMesh(int mesh_index,  shape_msgs::Mesh mesh, geometry_msgs::Vector3 offset);
 
 
 public:
@@ -98,6 +101,7 @@ public:
 
   void receivedMeshedSceneCB(const actionlib::SimpleClientGoalState& state, const graspit_shape_completion::GetSegmentedMeshedSceneResultConstPtr& result);
   void completeMeshCB(const actionlib::SimpleClientGoalState& state, const graspit_shape_completion::CompleteMeshResultConstPtr& result);
+  void getSegmentedMeshesCB(const graspit_shape_completion::GetSegmentedMeshedSceneResultConstPtr& result);
 
   public slots:
 
