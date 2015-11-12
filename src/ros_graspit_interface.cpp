@@ -63,48 +63,6 @@
 #include <QtGui>
 #include <thread>
 
-//class FunctorCallEvent : public QEvent {
-//   std::function<void()> m_fun;
-//public:
-//   FunctorCallEvent(const std::function<void()> & fun) :
-//      QEvent(QEvent::None), m_fun(fun) {}
-//   FunctorCallEvent(std::function<void()> && fun, QObject * receiver) :
-//      QEvent(QEvent::None), m_fun(std::move(fun)) {}
-//   ~FunctorCallEvent() {
-//      m_fun();
-//   }
-//};
-
-//void postToMainThread(const std::function<void()> & fun) {
-//   QCoreApplication::postEvent(qApp, new FunctorCallEvent(fun);
-//}
-
-//void postToMainThread(std::function<void()> && fun) {
-//   QCoreApplication::postEvent(qApp, new FunctorCallEvent(std::move(fun)));
-//}
-//------------------------- Convenience functions -------------------------------
-
-//namespace std
-//{
-//    template<> struct less<position>
-//    {
-//       bool operator() (const position& lhs, const position& rhs) const
-//       {
-//           if (lhs.x() != rhs.x())
-//           {
-//               return lhs.x() < rhs.x();
-//           }
-//           else if (lhs.y() != rhs.y())
-//           {
-//               return lhs.y() < rhs.y();
-//           }
-//           else
-//           {
-//               return lhs.z() < rhs.z();
-//           }
-//       }
-//    };
-//}
 
 namespace graspit_ros_planning
 {
@@ -121,13 +79,6 @@ void meshMsgToVerticesTriangles(const shape_msgs::Mesh &mesh, std::vector<positi
     {
         shape_msgs::MeshTriangle t = mesh.triangles.at(i);
 
-//        geometry_msgs::Point p0 = mesh.vertices.at(t.vertex_indices.at(0));
-//        geometry_msgs::Point p1 = mesh.vertices.at(t.vertex_indices.at(1));
-//        geometry_msgs::Point p2 = mesh.vertices.at(t.vertex_indices.at(2));
-
-//        triangles.push_back(Triangle(position(p0.x, p0.y,p0.z),
-//                                     position(p1.x, p1.y,p1.z),
-//                                     position(p2.x, p2.y,p2.z)));
         triangles->push_back(t.vertex_indices.at(0));
         triangles->push_back(t.vertex_indices.at(1));
         triangles->push_back(t.vertex_indices.at(2));
@@ -136,7 +87,6 @@ void meshMsgToVerticesTriangles(const shape_msgs::Mesh &mesh, std::vector<positi
 
 void verticesToMeshMsg(shape_msgs::Mesh &mesh, std::vector<position> *vertices)
 {
-    //std::map<position, int> point_to_indice;
 
     for(int i=0 ; i < vertices->size();i++)
     {
@@ -147,17 +97,8 @@ void verticesToMeshMsg(shape_msgs::Mesh &mesh, std::vector<position> *vertices)
         gp.z = p.z();
         mesh.vertices.push_back(gp);
 
-        //point_to_indice[p] = i;
     }
 
-//    for(int i=0 ; i < triangles->size();i++)
-//    {
-//        Triangle t = triangles.at(i);
-//        int v1 = point_to_indice.find(t.v1);
-//        int v2 = point_to_indice.find(t.v2);
-//        int v3 = point_to_indice.find(t.v3);
-//        mesh.triangles.push_back(shape_msgs::MeshTriangle(v1,v2,v3));
-//    }
 }
 
 
@@ -242,8 +183,6 @@ int RosGraspitInterface::init(int argc, char **argv)
 
   QObject::connect(captureSceneButton, SIGNAL(clicked()), this, SLOT(onCaptureSceneButtonPressed()));
   QObject::connect(shapeCompletionButton, SIGNAL(clicked()), this, SLOT(onCompleteShapeButtonPressed()));
-//  QObject::connect(this, SIGNAL(addMeshesSignal(graspit_shape_completion::GetSegmentedMeshedSceneResultConstPtr)),
-//          this, SLOT(addMeshesSlot(graspit_shape_completion::GetSegmentedMeshedSceneResultConstPtr)));
 
 
   ROS_INFO("ROS GraspIt node ready");
@@ -336,14 +275,19 @@ void RosGraspitInterface::onCompleteShapeButtonPressed()
     ROS_INFO("onCompleteShapeButtonPressed\n");
     graspit_shape_completion::CompleteMeshGoal goal;
 
-    Body *b = graspItGUI->getMainWorld()->getSelectedBody(0);
+    ROS_INFO("getting SelectedBody\n");
+    //Body *b = graspItGUI->getMainWorld()->getSelectedBody(0);
+    GraspableBody *b = graspItGUI->getMainWorld()->getGB(0);
 
     std::vector<position> vertices;
 
+    ROS_INFO("getting Body Vertices\n");
     b->getGeometryVertices(&vertices);
 
+    ROS_INFO("converting Vertices to Mesh Message\n");
     verticesToMeshMsg(goal.partial_mesh, &vertices);
 
+    ROS_INFO("Sending Goal\n");
     complete_mesh_client->sendGoal(goal,  boost::bind(&RosGraspitInterface::completeMeshCB, this, _1, _2),
                 actionlib::SimpleActionClient<graspit_shape_completion::CompleteMeshAction>::SimpleActiveCallback(),
                 actionlib::SimpleActionClient<graspit_shape_completion::CompleteMeshAction>::SimpleFeedbackCallback());
@@ -355,12 +299,16 @@ void RosGraspitInterface::completeMeshCB(const actionlib::SimpleClientGoalState&
                        const graspit_shape_completion::CompleteMeshResultConstPtr& result)
 {
     ROS_INFO("Sucessfully recieved completed mesh");
-    std::vector<int> triangles;
-    std::vector<position> vertices;
-    meshMsgToVerticesTriangles(result->completed_mesh, &vertices, &triangles);
+//    std::vector<int> triangles;
+//    std::vector<position> vertices;
+//    meshMsgToVerticesTriangles(result->completed_mesh, &vertices, &triangles);
+//    ROS_INFO("Sucessfullyconverted msg to vertices and triangles");
+    addMesh(100, result->completed_mesh, geometry_msgs::Vector3());
 
-    Body *b = graspItGUI->getMainWorld()->getSelectedBody(0);
-    b->loadGeometryMemory(vertices, triangles);
+    //GraspableBody *b = new GraspableBody;// graspItGUI->getMainWorld()->getGB(0);
+//    GraspableBody *b = new GraspableBody(graspItGUI->getMainWorld());
+//    ROS_INFO("Got body to be completed");
+//    b->loadGeometryMemory(vertices, triangles);
 }
 
 
