@@ -48,6 +48,7 @@
 #include <include/world.h>
 #include <include/body.h>
 #include <include/graspitGUI.h>
+#include <ui/mainWindow.h>
 #include <include/ivmgr.h>
 #include <include/scanSimulator.h>
 #include <include/pr2Gripper.h>
@@ -277,6 +278,7 @@ void RosGraspitInterface::onCompleteShapeButtonPressed()
 
     ROS_INFO("getting SelectedBody\n");
     //Body *b = graspItGUI->getMainWorld()->getSelectedBody(0);
+    //int gb = graspItGUI->getMainWindow()->mUI->graspedBodyBox->currentItem();
     GraspableBody *b = graspItGUI->getMainWorld()->getGB(0);
 
     std::vector<position> vertices;
@@ -299,16 +301,19 @@ void RosGraspitInterface::completeMeshCB(const actionlib::SimpleClientGoalState&
                        const graspit_shape_completion::CompleteMeshResultConstPtr& result)
 {
     ROS_INFO("Sucessfully recieved completed mesh");
-//    std::vector<int> triangles;
-//    std::vector<position> vertices;
-//    meshMsgToVerticesTriangles(result->completed_mesh, &vertices, &triangles);
-//    ROS_INFO("Sucessfullyconverted msg to vertices and triangles");
-    addMesh(100, result->completed_mesh, geometry_msgs::Vector3());
 
-    //GraspableBody *b = new GraspableBody;// graspItGUI->getMainWorld()->getGB(0);
-//    GraspableBody *b = new GraspableBody(graspItGUI->getMainWorld());
-//    ROS_INFO("Got body to be completed");
-//    b->loadGeometryMemory(vertices, triangles);
+    //int gb = graspItGUI->getMainWindow()->mUI->graspedBodyBox->currentItem();
+
+    GraspableBody *b = graspItGUI->getMainWorld()->getGB(0);
+    transf *t = b->getTran();
+
+    geometry_msgs::Vector3 offset; = geometry_msgs::Vector3();
+
+    offset.x = t->translation().x();
+    offset.y = t->translation().y();
+    offset.z = t->translation().z();
+
+    addMesh(100, result->completed_mesh, offset);
 }
 
 
