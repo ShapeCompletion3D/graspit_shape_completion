@@ -48,7 +48,7 @@
 #include <include/world.h>
 #include <include/body.h>
 #include <include/graspitGUI.h>
-#include <ui/mainWindow.h>
+//#include <ui/mainWindow.h>
 #include <include/ivmgr.h>
 #include <include/scanSimulator.h>
 #include <include/pr2Gripper.h>
@@ -107,7 +107,8 @@ RosGraspitInterface::RosGraspitInterface() :
     root_nh_(NULL),
     priv_nh_(NULL),
     get_segmented_meshed_scene_client(NULL),
-    complete_mesh_client(NULL)
+    complete_mesh_client(NULL),
+    graspable_body_index(0)
 {
 }
 
@@ -170,7 +171,13 @@ int RosGraspitInterface::init(int argc, char **argv)
   ROS_INFO("MAKING SHAPE COMPLETION UI");
 
   QPushButton * captureSceneButton = new QPushButton("Capture Scene");
+
+  QPushButton * nextGraspableBodyButton = new QPushButton("next");
+  QPushButton * prevGraspableBodyButton = new QPushButton("prev");
+
   QPushButton * shapeCompletionButton = new QPushButton("Complete Selected Mesh");
+
+
 
   captureSceneButton->setDefault(true);
   shapeCompletionButton->setDefault(true);
@@ -178,12 +185,17 @@ int RosGraspitInterface::init(int argc, char **argv)
   QDialogButtonBox *shapeCompletionControlBox = new QDialogButtonBox(Qt::Vertical);
 
   shapeCompletionControlBox->addButton(captureSceneButton, QDialogButtonBox::ActionRole);
+  shapeCompletionControlBox->addButton(nextGraspableBodyButton, QDialogButtonBox::ActionRole);
+  shapeCompletionControlBox->addButton(prevGraspableBodyButton, QDialogButtonBox::ActionRole);
   shapeCompletionControlBox->addButton(shapeCompletionButton, QDialogButtonBox::ActionRole);
   shapeCompletionControlBox->resize(QSize(200,100));
   shapeCompletionControlBox->show();
 
   QObject::connect(captureSceneButton, SIGNAL(clicked()), this, SLOT(onCaptureSceneButtonPressed()));
   QObject::connect(shapeCompletionButton, SIGNAL(clicked()), this, SLOT(onCompleteShapeButtonPressed()));
+
+  QObject::connect(nextGraspableBodyButton, SIGNAL(clicked()), this, SLOT(onNextGraspableBodyButtonPressed()));
+  QObject::connect(prevGraspableBodyButton, SIGNAL(clicked()), this, SLOT(onPrevGraspableBodyButtonPressed()));
 
 
   ROS_INFO("ROS GraspIt node ready");
@@ -217,7 +229,8 @@ void RosGraspitInterface::getSegmentedMeshesCB(const graspit_shape_completion::G
     {
         for (int i =0; i < result->meshes.size(); i++)
         {
-            addMesh(i, result->meshes.at(i), result->offsets.at(i));
+            int new_mesh_index = graspItGUI->getMainWorld()->getNumGB();
+            addMesh(new_mesh_index, result->meshes.at(i), result->offsets.at(i));
         }
     }
     ROS_INFO("Sucessfully recieved meshed scene");
@@ -230,6 +243,35 @@ void RosGraspitInterface::receivedMeshedSceneCB(const actionlib::SimpleClientGoa
 {
     getSegmentedMeshesCB(result);
     ROS_INFO("Sucessfully recieved meshed scene");
+}
+
+void RosGraspitInterface::onNextGraspableBodyButtonPressed()
+{
+    graspable_body_index += 1;
+    if (graspable_body_index == graspItGUI->getMainWorld()->getNumGB())
+    {
+        graspable_body_index= 0;
+    }
+    GraspableBody *b = graspItGUI->getMainWorld()->getGB(graspable_body_index);
+    if(b)
+    {
+        ROS_INFO("setting mesh name: %s", b->getName().toAscii().constData());
+    }
+
+}
+
+void RosGraspitInterface::onPrevGraspableBodyButtonPressed()
+{
+    graspable_body_index -= 1;
+    if (graspable_body_index == -1)
+    {
+        graspable_body_index= graspItGUI->getMainWorld()->getNumGB()-1;
+    }
+    GraspableBody *b = graspItGUI->getMainWorld()->getGB(graspable_body_index);
+    if(b)
+    {
+        ROS_INFO("setting mesh name: %s", b->getName().toAscii().constData());
+    }
 }
 
 
@@ -279,7 +321,7 @@ void RosGraspitInterface::onCompleteShapeButtonPressed()
     ROS_INFO("getting SelectedBody\n");
     //Body *b = graspItGUI->getMainWorld()->getSelectedBody(0);
     //int gb = graspItGUI->getMainWindow()->mUI->graspedBodyBox->currentItem();
-    GraspableBody *b = graspItGUI->getMainWorld()->getGB(0);
+    GraspableBody *b = graspItGUI->getMainWorld()->getGB(graspable_body_index);
 
     std::vector<position> vertices;
 
@@ -302,18 +344,17 @@ void RosGraspitInterface::completeMeshCB(const actionlib::SimpleClientGoalState&
 {
     ROS_INFO("Sucessfully recieved completed mesh");
 
-    //int gb = graspItGUI->getMainWindow()->mUI->graspedBodyBox->currentItem();
+    GraspableBody *b = graspItGUI->getMainWorld()->getGB(graspable_body_index);
+    transf t = b->getTran();
 
-    GraspableBody *b = graspItGUI->getMainWorld()->getGB(0);
-    transf *t = b->getTran();
+    geometry_msgs::Vector3 offset = geometry_msgs::Vector3();
 
-    geometry_msgs::Vector3 offset; = geometry_msgs::Vector3();
+    offset.x = t.translation().x();
+    offset.y = t.translation().y();
+    offset.z = t.translation().z();
 
-    offset.x = t->translation().x();
-    offset.y = t->translation().y();
-    offset.z = t->translation().z();
-
-    addMesh(100, result->completed_mesh, offset);
+    int new_mesh_index = graspItGUI->getMainWorld()->getNumGB();
+    addMesh(new_mesh_index, result->completed_mesh, offset);
 }
 
 
