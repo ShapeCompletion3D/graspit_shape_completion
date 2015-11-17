@@ -32,9 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-//#include "graspit_shape_completion/ros_graspit_interface.h"
 #include "include/graspit_shape_completion/ros_graspit_interface.h"
-//#include "ros_graspit_interface.h"
 
 #include <boost/foreach.hpp>
 #include <cmath>
@@ -48,7 +46,6 @@
 #include <include/world.h>
 #include <include/body.h>
 #include <include/graspitGUI.h>
-//#include <ui/mainWindow.h>
 #include <include/ivmgr.h>
 #include <include/scanSimulator.h>
 #include <include/pr2Gripper.h>
@@ -158,8 +155,7 @@ int RosGraspitInterface::init(int argc, char **argv)
                                                                         10,
                                                                         &RosGraspitInterface::getSegmentedMeshesCB,
                                                                         this);
-  //ROS_INFO("Using node name %s", node_name.c_str());
-  //clean up ros arguments
+  ROS_INFO("Using node name %s", node_name.c_str());
   for (int i = 0; i < argc; i++)
   {
     delete ros_argv[i];
@@ -319,8 +315,6 @@ void RosGraspitInterface::onCompleteShapeButtonPressed()
     graspit_shape_completion::CompleteMeshGoal goal;
 
     ROS_INFO("getting SelectedBody\n");
-    //Body *b = graspItGUI->getMainWorld()->getSelectedBody(0);
-    //int gb = graspItGUI->getMainWindow()->mUI->graspedBodyBox->currentItem();
     GraspableBody *b = graspItGUI->getMainWorld()->getGB(graspable_body_index);
 
     std::vector<position> vertices;
