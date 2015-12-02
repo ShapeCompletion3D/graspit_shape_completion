@@ -86,7 +86,7 @@ private:
   ros::Publisher meshed_scene_repub;
   ros::Subscriber meshed_scene_sub;
 
-  int graspable_body_index;
+  Body* selected_body;
 
   void addMesh(int mesh_index,  shape_msgs::Mesh mesh, geometry_msgs::Vector3 offset);
 
@@ -109,8 +109,6 @@ public:
 
       void onCaptureSceneButtonPressed();
       void onCompleteShapeButtonPressed();
-      void onNextGraspableBodyButtonPressed();
-      void onPrevGraspableBodyButtonPressed();
 
 };
 

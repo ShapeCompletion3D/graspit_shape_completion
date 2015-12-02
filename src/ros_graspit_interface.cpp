@@ -104,8 +104,7 @@ RosGraspitInterface::RosGraspitInterface() :
     root_nh_(NULL),
     priv_nh_(NULL),
     get_segmented_meshed_scene_client(NULL),
-    complete_mesh_client(NULL),
-    graspable_body_index(0)
+    complete_mesh_client(NULL)
 {
 }
 
@@ -181,17 +180,12 @@ int RosGraspitInterface::init(int argc, char **argv)
   QDialogButtonBox *shapeCompletionControlBox = new QDialogButtonBox(Qt::Vertical);
 
   shapeCompletionControlBox->addButton(captureSceneButton, QDialogButtonBox::ActionRole);
-  shapeCompletionControlBox->addButton(nextGraspableBodyButton, QDialogButtonBox::ActionRole);
-  shapeCompletionControlBox->addButton(prevGraspableBodyButton, QDialogButtonBox::ActionRole);
   shapeCompletionControlBox->addButton(shapeCompletionButton, QDialogButtonBox::ActionRole);
   shapeCompletionControlBox->resize(QSize(200,100));
   shapeCompletionControlBox->show();
 
   QObject::connect(captureSceneButton, SIGNAL(clicked()), this, SLOT(onCaptureSceneButtonPressed()));
   QObject::connect(shapeCompletionButton, SIGNAL(clicked()), this, SLOT(onCompleteShapeButtonPressed()));
-
-  QObject::connect(nextGraspableBodyButton, SIGNAL(clicked()), this, SLOT(onNextGraspableBodyButtonPressed()));
-  QObject::connect(prevGraspableBodyButton, SIGNAL(clicked()), this, SLOT(onPrevGraspableBodyButtonPressed()));
 
 
   ROS_INFO("ROS GraspIt node ready");
@@ -206,6 +200,14 @@ int RosGraspitInterface::mainLoop()
 
 void RosGraspitInterface::onCaptureSceneButtonPressed()
 {
+    int numGB = graspItGUI->getMainWorld()->getNumGB();
+    for (int i=0; i < numGB; i++)
+    {
+        graspItGUI->getMainWorld()->removeElementFromSceneGraph(graspItGUI->getMainWorld()->getGB(i));
+        graspItGUI->getMainWorld()->destroyElement(graspItGUI->getMainWorld()->getGB(i), true);
+    }
+
+
     ROS_INFO("onCaptureSceneButtonPressed\n");
     std::cout << "ThreadId" <<std::this_thread::get_id() << std::endl;
     graspit_shape_completion::GetSegmentedMeshedSceneGoal goal;
@@ -239,35 +241,6 @@ void RosGraspitInterface::receivedMeshedSceneCB(const actionlib::SimpleClientGoa
 {
     getSegmentedMeshesCB(result);
     ROS_INFO("Sucessfully recieved meshed scene");
-}
-
-void RosGraspitInterface::onNextGraspableBodyButtonPressed()
-{
-    graspable_body_index += 1;
-    if (graspable_body_index == graspItGUI->getMainWorld()->getNumGB())
-    {
-        graspable_body_index= 0;
-    }
-    GraspableBody *b = graspItGUI->getMainWorld()->getGB(graspable_body_index);
-    if(b)
-    {
-        ROS_INFO("setting mesh name: %s", b->getName().toAscii().constData());
-    }
-
-}
-
-void RosGraspitInterface::onPrevGraspableBodyButtonPressed()
-{
-    graspable_body_index -= 1;
-    if (graspable_body_index == -1)
-    {
-        graspable_body_index= graspItGUI->getMainWorld()->getNumGB()-1;
-    }
-    GraspableBody *b = graspItGUI->getMainWorld()->getGB(graspable_body_index);
-    if(b)
-    {
-        ROS_INFO("setting mesh name: %s", b->getName().toAscii().constData());
-    }
 }
 
 
@@ -314,13 +287,20 @@ void RosGraspitInterface::onCompleteShapeButtonPressed()
     ROS_INFO("onCompleteShapeButtonPressed\n");
     graspit_shape_completion::CompleteMeshGoal goal;
 
+    int numSelectedBodies = graspItGUI->getMainWorld()->getNumSelectedBodies();
+    if (numSelectedBodies == 0)
+    {
+        ROS_INFO("No Selected Bodies!\n");
+        return;
+    }
+    selected_body = graspItGUI->getMainWorld()->getSelectedBody(0);
+
     ROS_INFO("getting SelectedBody\n");
-    GraspableBody *b = graspItGUI->getMainWorld()->getGB(graspable_body_index);
 
     std::vector<position> vertices;
 
     ROS_INFO("getting Body Vertices\n");
-    b->getGeometryVertices(&vertices);
+    selected_body->getGeometryVertices(&vertices);
 
     ROS_INFO("converting Vertices to Mesh Message\n");
     verticesToMeshMsg(goal.partial_mesh, &vertices);
@@ -338,14 +318,16 @@ void RosGraspitInterface::completeMeshCB(const actionlib::SimpleClientGoalState&
 {
     ROS_INFO("Sucessfully recieved completed mesh");
 
-    GraspableBody *b = graspItGUI->getMainWorld()->getGB(graspable_body_index);
-    transf t = b->getTran();
+    transf t = selected_body->getTran();
 
     geometry_msgs::Vector3 offset = geometry_msgs::Vector3();
 
     offset.x = t.translation().x();
     offset.y = t.translation().y();
     offset.z = t.translation().z();
+
+    //remove the object we are completing
+    graspItGUI->getMainWorld()->destroyElement(selected_body, true);
 
     int new_mesh_index = graspItGUI->getMainWorld()->getNumGB();
     addMesh(new_mesh_index, result->completed_mesh, offset);
