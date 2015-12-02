@@ -166,13 +166,7 @@ int RosGraspitInterface::init(int argc, char **argv)
   ROS_INFO("MAKING SHAPE COMPLETION UI");
 
   QPushButton * captureSceneButton = new QPushButton("Capture Scene");
-
-  QPushButton * nextGraspableBodyButton = new QPushButton("next");
-  QPushButton * prevGraspableBodyButton = new QPushButton("prev");
-
   QPushButton * shapeCompletionButton = new QPushButton("Complete Selected Mesh");
-
-
 
   captureSceneButton->setDefault(true);
   shapeCompletionButton->setDefault(true);
