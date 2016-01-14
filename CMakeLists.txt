@@ -118,7 +118,7 @@ source_group("Generated Sources - Do Not Edit" FILES ${GENERATED_SOURCES})
 include_directories("${CMAKE_BINARY_DIR}")
 
 ## Declare a cpp library
- add_library(ros_graspit_interface
+ add_library(graspit_shape_completion_interface
     ${SOURCES}
     ${HEADERS}
     ${GENERATED_SOURCES}
@@ -130,10 +130,10 @@ include_directories("${CMAKE_BINARY_DIR}")
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
- add_dependencies(ros_graspit_interface graspit ${QT_DEFINITIONS})
+ add_dependencies(graspit_shape_completion_interface graspit ${QT_DEFINITIONS})
 
 ## Specify libraries to link a library or executable target against
- target_link_libraries(ros_graspit_interface
+ target_link_libraries(graspit_shape_completion_interface
    ${catkin_LIBRARIES}
    ${QT_LIBRARIES}
  )

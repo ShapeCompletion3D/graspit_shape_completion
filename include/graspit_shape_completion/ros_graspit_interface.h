@@ -37,6 +37,7 @@
 
 #include <map>
 #include <QObject>
+#include <QLabel>
 
 //GraspIt! includes
 #include <include/plugin.h>
@@ -88,6 +89,11 @@ private:
 
   Body* selected_body;
 
+  QLabel * scene_segmentation_time;
+  QLabel * target_completion_time;
+  QLabel * grasp_planning_time;
+
+
   void addMesh(int mesh_index,  shape_msgs::Mesh mesh, geometry_msgs::Vector3 offset);
 
 
@@ -109,6 +115,7 @@ public:
 
       void onCaptureSceneButtonPressed();
       void onCompleteShapeButtonPressed();
+      void onGraspPlanningButtonPressed();
 
 };
 

@@ -3,5 +3,6 @@ shape_msgs/Mesh partial_mesh
 ---
 #result
 shape_msgs/Mesh completed_mesh
+int32 completion_time
 ---
 #feedback

@@ -55,6 +55,7 @@
 #include <include/EGPlanner/egPlanner.h>
 #include <include/EGPlanner/simAnnPlanner.h>
 
+
 #include <include/grasp.h>
 #include <include/triangle.h>
 #include <geometry_msgs/Point.h>
@@ -167,15 +168,30 @@ int RosGraspitInterface::init(int argc, char **argv)
 
   QPushButton * captureSceneButton = new QPushButton("Capture Scene");
   QPushButton * shapeCompletionButton = new QPushButton("Complete Selected Mesh");
+  QPushButton * graspPlanningButton = new QPushButton("Plan Grasps");
 
   captureSceneButton->setDefault(true);
   shapeCompletionButton->setDefault(true);
 
-  QDialogButtonBox *shapeCompletionControlBox = new QDialogButtonBox(Qt::Vertical);
+  QWidget *shapeCompletionControlBox = new QWidget();
 
-  shapeCompletionControlBox->addButton(captureSceneButton, QDialogButtonBox::ActionRole);
-  shapeCompletionControlBox->addButton(shapeCompletionButton, QDialogButtonBox::ActionRole);
-  shapeCompletionControlBox->resize(QSize(200,100));
+  scene_segmentation_time = new QLabel(tr("Scene Segmentation Time:?"));
+  target_completion_time = new QLabel(tr("Target Completion Time:?"));
+  grasp_planning_time = new QLabel(tr("Grasp Planning Time:?"));
+
+  QGridLayout *mainLayout = new QGridLayout;
+  mainLayout->addWidget(scene_segmentation_time, 0, 0);
+  mainLayout->addWidget(target_completion_time, 1,0);
+  mainLayout->addWidget(grasp_planning_time, 2,0);
+  mainLayout->addWidget(captureSceneButton, 0, 1, 1, 2);
+  mainLayout->addWidget(shapeCompletionButton, 1, 1, 1, 2);
+  mainLayout->addWidget(graspPlanningButton, 2, 1, 1, 2);
+
+  shapeCompletionControlBox->setLayout(mainLayout);
+
+
+  //shapeCompletionControlBox->resize(QSize(200,100));
+
   shapeCompletionControlBox->show();
 
   QObject::connect(captureSceneButton, SIGNAL(clicked()), this, SLOT(onCaptureSceneButtonPressed()));
@@ -190,6 +206,11 @@ int RosGraspitInterface::mainLoop()
 {
   ros::spinOnce();
   return 0;
+}
+
+void RosGraspitInterface::onGraspPlanningButtonPressed()
+{
+    //graspItGUI->getMainWindow()->eigenGraspPlannerActivated();
 }
 
 void RosGraspitInterface::onCaptureSceneButtonPressed()
@@ -225,6 +246,7 @@ void RosGraspitInterface::getSegmentedMeshesCB(const graspit_shape_completion::G
             addMesh(new_mesh_index, result->meshes.at(i), result->offsets.at(i));
         }
     }
+
     ROS_INFO("Sucessfully recieved meshed scene");
 
 
@@ -234,6 +256,7 @@ void RosGraspitInterface::receivedMeshedSceneCB(const actionlib::SimpleClientGoa
                        const graspit_shape_completion::GetSegmentedMeshedSceneResultConstPtr& result)
 {
     getSegmentedMeshesCB(result);
+    scene_segmentation_time->setText(QString(result->completion_time));
     ROS_INFO("Sucessfully recieved meshed scene");
 }
 
@@ -311,6 +334,7 @@ void RosGraspitInterface::completeMeshCB(const actionlib::SimpleClientGoalState&
                        const graspit_shape_completion::CompleteMeshResultConstPtr& result)
 {
     ROS_INFO("Sucessfully recieved completed mesh");
+    target_completion_time->setText(QString(result->completion_time));
 
     transf t = selected_body->getTran();
 
@@ -321,9 +345,12 @@ void RosGraspitInterface::completeMeshCB(const actionlib::SimpleClientGoalState&
     offset.z = t.translation().z();
 
     //remove the object we are completing
+    //graspItGUI->getMainWorld()->deselectElement(selected_body);
+    graspItGUI->getMainWorld()->deselectAll();
     graspItGUI->getMainWorld()->destroyElement(selected_body, true);
 
-    int new_mesh_index = graspItGUI->getMainWorld()->getNumGB();
+
+    int new_mesh_index = graspItGUI->getMainWorld()->getNumGB() + 1;
     addMesh(new_mesh_index, result->completed_mesh, offset);
 }
 
