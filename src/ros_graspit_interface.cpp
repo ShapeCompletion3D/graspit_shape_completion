@@ -321,9 +321,11 @@ void RosGraspitInterface::completeMeshCB(const actionlib::SimpleClientGoalState&
     offset.z = t.translation().z();
 
     //remove the object we are completing
+    graspItGUI->getMainWorld()->deselectAll();
+
     graspItGUI->getMainWorld()->destroyElement(selected_body, true);
 
-    int new_mesh_index = graspItGUI->getMainWorld()->getNumGB();
+    int new_mesh_index = graspItGUI->getMainWorld()->getNumGB() + 1;
     addMesh(new_mesh_index, result->completed_mesh, offset);
 }
 
