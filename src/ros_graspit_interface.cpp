@@ -256,7 +256,7 @@ void RosGraspitInterface::receivedMeshedSceneCB(const actionlib::SimpleClientGoa
                        const graspit_shape_completion::GetSegmentedMeshedSceneResultConstPtr& result)
 {
     getSegmentedMeshesCB(result);
-    scene_segmentation_time->setText(QString(result->completion_time));
+    scene_segmentation_time->setText(QString("Scene Segmentation Time (ms): ") + QString::number(result->completion_time));
     ROS_INFO("Sucessfully recieved meshed scene");
 }
 
@@ -334,7 +334,7 @@ void RosGraspitInterface::completeMeshCB(const actionlib::SimpleClientGoalState&
                        const graspit_shape_completion::CompleteMeshResultConstPtr& result)
 {
     ROS_INFO("Sucessfully recieved completed mesh");
-    target_completion_time->setText(QString(result->completion_time));
+    target_completion_time->setText(QString("Target Completion Time(ms): ") + QString::number(result->completion_time));
 
     transf t = selected_body->getTran();
 
