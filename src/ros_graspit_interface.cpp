@@ -176,13 +176,19 @@ int RosGraspitInterface::init(int argc, char **argv)
   QWidget *shapeCompletionControlBox = new QWidget();
 
   scene_segmentation_time = new QLabel(tr("Scene Segmentation Time:?"));
+  target_total_time = new QLabel(tr("Target Completion Time:?"));
+  target_preprocess_time = new QLabel(tr("Target Completion Time:?"));
   target_completion_time = new QLabel(tr("Target Completion Time:?"));
+  target_postprocess_time = new QLabel(tr("Target Completion Time:?"));
   grasp_planning_time = new QLabel(tr("Grasp Planning Time:?"));
 
   QGridLayout *mainLayout = new QGridLayout;
   mainLayout->addWidget(scene_segmentation_time, 0, 0);
-  mainLayout->addWidget(target_completion_time, 1,0);
-  mainLayout->addWidget(grasp_planning_time, 2,0);
+  mainLayout->addWidget(target_total_time, 1,0);
+  mainLayout->addWidget(target_preprocess_time, 2,0);
+  mainLayout->addWidget(target_completion_time, 3,0);
+  mainLayout->addWidget(target_postprocess_time, 4,0);
+  mainLayout->addWidget(grasp_planning_time, 5,0);
   mainLayout->addWidget(captureSceneButton, 0, 1, 1, 2);
   mainLayout->addWidget(shapeCompletionButton, 1, 1, 1, 2);
   mainLayout->addWidget(graspPlanningButton, 2, 1, 1, 2);
@@ -334,7 +340,10 @@ void RosGraspitInterface::completeMeshCB(const actionlib::SimpleClientGoalState&
                        const graspit_shape_completion::CompleteMeshResultConstPtr& result)
 {
     ROS_INFO("Sucessfully recieved completed mesh");
+    target_total_time->setText(QString("Target Total Time(ms): ") + QString::number(result->total_time));
+    target_preprocess_time->setText(QString("Target Pre-processing Time(ms): ") + QString::number(result->preprocess_time));
     target_completion_time->setText(QString("Target Completion Time(ms): ") + QString::number(result->completion_time));
+    target_postprocess_time->setText(QString("Target Post-processing Time(ms): ") + QString::number(result->postprocess_time));
 
     transf t = selected_body->getTran();
 
