@@ -3,5 +3,6 @@
 #result
 shape_msgs/Mesh[] meshes
 geometry_msgs/Vector3[] offsets
+int32 completion_time
 ---
 #feedback

@@ -10,6 +10,12 @@ find_package(catkin REQUIRED graspit shape_msgs actionlib)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 find_package(Qt4 COMPONENTS QtCore QtGui  REQUIRED)
+find_package(PCL 1.2 REQUIRED)
+
+
+include_directories(${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -136,6 +142,7 @@ include_directories("${CMAKE_BINARY_DIR}")
  target_link_libraries(graspit_shape_completion_interface
    ${catkin_LIBRARIES}
    ${QT_LIBRARIES}
+${PCL_LIBRARIES}
  )
 
 
