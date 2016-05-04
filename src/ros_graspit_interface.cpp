@@ -201,11 +201,10 @@ int RosGraspitInterface::init(int argc, char **argv)
 
     scene_segmentation_time = new QLabel(tr("Scene Segmentation Time:?"));
     target_completion_time = new QLabel(tr("Target Completion Time:?"));
-    target_total_time = new QLabel(tr("Target Completion Time:?"));
-    target_preprocess_time = new QLabel(tr("Target Completion Time:?"));
+    target_total_time = new QLabel(tr("Target Completeion Total Time:?"));
+    target_preprocess_time = new QLabel(tr("Target Preprocess Time:?"));
     target_completion_time = new QLabel(tr("Target Completion Time:?"));
-    target_postprocess_time = new QLabel(tr("Target Completion Time:?"));
-    grasp_planning_time = new QLabel(tr("Grasp Planning Time:?"));
+    target_postprocess_time = new QLabel(tr("Target PostProcess Time:?"));
 
     QGridLayout *mainLayout = new QGridLayout;
     mainLayout->addWidget(scene_segmentation_time, 0, 0);
@@ -213,10 +212,8 @@ int RosGraspitInterface::init(int argc, char **argv)
     mainLayout->addWidget(target_preprocess_time, 2,0);
     mainLayout->addWidget(target_completion_time, 3,0);
     mainLayout->addWidget(target_postprocess_time, 4,0);
-    mainLayout->addWidget(grasp_planning_time, 5,0);
     mainLayout->addWidget(captureSceneButton, 0, 1, 1, 2);
     mainLayout->addWidget(shapeCompletionButton, 1, 1, 1, 2);
-    mainLayout->addWidget(graspPlanningButton, 2, 1, 1, 2);
     mainLayout->addWidget(objectRecButton, 3, 1, 1, 2);
 
     shapeCompletionControlBox->setLayout(mainLayout);

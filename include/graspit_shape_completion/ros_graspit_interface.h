@@ -92,6 +92,9 @@ private:
 
   QLabel * scene_segmentation_time;
   QLabel * target_completion_time;
+  QLabel * target_total_time;
+QLabel * target_preprocess_time;
+QLabel * target_postprocess_time;
   QLabel * grasp_planning_time;
 
 
