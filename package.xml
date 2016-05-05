@@ -4,19 +4,14 @@
   <version>0.0.0</version>
   <description>
 
-    ROS interface to GraspIt! exposing a number of services such as
-    loading objects or obstacles into the GraspIt! world, or performing
-    graspl planning or testing for the PR2 gripper. Originally
-    developped to serve the needs of the probabilistic_grasp_planner
-    node and project; can serve as an example of how to use GraspIt!
-    from within ROS.
+    Interface to upload planning scenes into GraspIt!
 
   </description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
   <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
-  <maintainer email="jvarley@todo.todo">jvarley</maintainer>
+  <maintainer email="jvarley@gmail.com">jvarley</maintainer>
 
 
   <!-- One license tag required, multiple allowed, one license per tag -->
@@ -29,13 +24,13 @@
   <!-- Optional attribute type can be: website, bugtracker, or repository -->
   <!-- Example: -->
   <!-- <url type="website">http://wiki.ros.org/test</url> -->
-  <url>http://ros.org/wiki/graspit_ros_planning</url>
+  <url>None</url>
 
   <!-- Author tags are optional, mutiple are allowed, one per tag -->
   <!-- Authors do not have to be maintianers, but could be -->
   <!-- Example: -->
   <!-- <author email="jane.doe@example.com">Jane Doe</author> -->
-  <author>Matei Ciocarlie</author>
+  <author>Jake Varley</author>
 
   <!-- The *_depend tags are used to specify dependencies -->
   <!-- Dependencies can be catkin packages or system dependencies -->
@@ -53,16 +48,19 @@
    <build_depend>roscpp</build_depend>
    <build_depend>geometry_msgs</build_depend>
    <build_depend>sensor_msgs</build_depend>
-   <build_depend>manipulation_msgs</build_depend>
    <build_depend>graspit</build_depend>
-   <build_depend>graspit_ros_planning_msgs</build_depend>
+   <build_depend>graspit_msgs</build_depend>
+   
+   <build_depend>message_generation</build_depend>
+   <run_depend>message_generation</run_depend>
 
+   <run_depend>message_runtime</run_depend>
    <run_depend>roscpp</run_depend>
    <run_depend>geometry_msgs</run_depend>
    <run_depend>sensor_msgs</run_depend>
-   <run_depend>manipulation_msgs</run_depend>
    <run_depend>graspit</run_depend>
-   <run_depend>graspit_ros_planning_msgs</run_depend>
+   <run_depend>graspit_msgs</run_depend>
+
 
 
   <export>

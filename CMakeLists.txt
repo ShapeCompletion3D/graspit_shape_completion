@@ -5,7 +5,7 @@ project(graspit_shape_completion)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED graspit shape_msgs actionlib)
+find_package(catkin REQUIRED COMPONENTS graspit graspit_msgs genmsg shape_msgs actionlib)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -137,6 +137,7 @@ include_directories("${CMAKE_BINARY_DIR}")
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
  add_dependencies(graspit_shape_completion_interface graspit ${QT_DEFINITIONS})
+add_dependencies(graspit_shape_completion_interface ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
  target_link_libraries(graspit_shape_completion_interface
